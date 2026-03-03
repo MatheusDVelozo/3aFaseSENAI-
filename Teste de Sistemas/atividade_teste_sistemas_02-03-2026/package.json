@@ -1,0 +1,21 @@
+{
+  "name": "atividade_teste_sistemas_02-03-2026",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js",
+    "dev": "mpde src/server.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^5.2.1"
+  },
+  "start": "node src/server.js",
+  "type": "module",
+  "devDependencies": {
+    "jest": "^30.2.0"
+  }
+}
