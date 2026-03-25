@@ -31,3 +31,19 @@ valor      Decimal
 
   @@map("exame")
 }
+
+enum YesNo {
+  Login
+  No
+}
+
+model Tokens {
+  id          Int     @id @default(autoincrement())
+  token       String
+  tipo_token  Role
+  revoked     Boolean @default(false)
+  expiresAt   DateTime
+  usuarioId
+
+  
+}
