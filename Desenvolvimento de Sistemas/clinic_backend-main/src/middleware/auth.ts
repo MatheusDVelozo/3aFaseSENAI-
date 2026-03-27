@@ -1,26 +1,24 @@
-import type { NextFunction } from "express";
 import { verificarTokenAcesso } from "../utils/jwt";
-import type { Request, Response } from "express";
-
-
+import type {
+    Response, Request, NextFunction
+} from "express";
 export function auth(req: Request, res: Response, next: NextFunction) {
-    const header = req.headers.authorization
+    const header = req.headers.authorization;
     if (!header?.startsWith("Bearer ")) {
-        return res.status(401).json({ message: "Missing Token" })
+        return res.status(401).json({
+            error: "missing token"
+        })
     }
-
     try {
         const token = header.slice("Bearer ".length)
         const payload = verificarTokenAcesso(token)
-        if (!payload) {
-            return res.status(401).json({ message: "Invalid Token" })
-
-        }
-        next()
-
+        if (!payload) return res.status(401).json({
+            error: "invalid token"
+        })
+        next();
     } catch {
-        return res.status(401).json({ message: "Invalid or expired Token" })
-
+        return res.status(401).json({
+            error: "invalid or expired token"
+        })
     }
-
 }

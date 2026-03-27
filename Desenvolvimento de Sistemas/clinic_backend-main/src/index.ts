@@ -2,7 +2,9 @@ import express from 'express';
 import { prisma } from './prisma/prisma';
 import type { Exame, Usuario, TypeToken } from './prisma/generated/prisma/client';
 import { createHash } from './utils/createHash';
-import bcrypt from 'bcrypt';
+import bcrypt from "bcrypt";
+import { signTokenAcesso, signTokenRefresh } from './utils/jwt';
+import { auth } from './middleware/auth';
 
 const app = express();
 app.use(express.json())
@@ -12,6 +14,82 @@ app.get('/', (req, res) => {
   console.log(req)
   res.send("Hello world")
 })
+
+//autenticacao
+app.post("/cadastro", async (req, res) => {
+  const dadosUsuario = req.body as Usuario
+  const hash = await createHash(dadosUsuario.senha);
+  const usuarioCriado = await prisma.usuario.create({
+    data: {
+      email: dadosUsuario.email,
+      nome: dadosUsuario.nome || null,
+      senha: hash
+    }
+  })
+  return res.status(201).json({
+    message: "Usuário criado com sucesso!",
+    data: usuarioCriado
+  })
+})
+
+app.post("/login", async (req, res) => {
+  const dadosUsuario = req.body as Partial<Usuario>
+  const existeUsuario = await prisma.usuario.findUnique({
+    where: {
+      email: dadosUsuario.email || '',
+    }
+  })
+  const credenciaisValidas = await bcrypt.compare(dadosUsuario.senha || "", existeUsuario?.senha || "")
+
+  if (existeUsuario && credenciaisValidas) {
+    const tokenAcesso = signTokenAcesso({
+      email: existeUsuario.email,
+      nome: existeUsuario.nome
+    })
+    const tokenRefresh = signTokenRefresh({
+      email: existeUsuario.email,
+      nome: existeUsuario.nome
+    })
+
+    const accessExpires = new Date()
+    const accessExpiresUpdate = accessExpires.setHours(accessExpires.getHours() + 1)
+    // acesso create
+    await prisma.token.create({
+      data: {
+        token: tokenAcesso,
+        expiresAt: new Date(accessExpiresUpdate),
+        type: 'ACCESS',
+        usuarioId: existeUsuario.id
+      }
+    })
+
+    //refresh create
+    const refreshExpires = new Date()
+    const refreshExpiresUpdated = refreshExpires.setMonth(refreshExpires.getMonth() + 1)
+
+    await prisma.token.create({
+      data: {
+        token: tokenRefresh,
+        expiresAt: new Date(refreshExpiresUpdated),
+        type: 'REFRESH',
+        usuarioId: existeUsuario.id
+      }
+    })
+
+    return res.status(200).json({
+      message: "Usuário autenticado com sucesso!",
+      accessToken: tokenAcesso,
+      refreshToken: tokenRefresh
+    })
+  }
+
+  return res.status(401).json({
+    message: "Credenciais inválidas"
+  })
+
+})
+
+app.use(auth)
 
 // Endpoints usuario
 app.get('/usuarios', async (_, res) => {
@@ -30,11 +108,9 @@ app.get('/usuarios/:id', async (req, res) => {
   return res.status(200).json(usuario);
 })
 
-app.post("/cadastro", async (req, res) => {
-  console.log(req.body)
+app.post("/usuarios", async (req, res) => {
   const dadosUsuario = req.body as Usuario
   const hash = await createHash(dadosUsuario.senha);
-
   const usuarioCriado = await prisma.usuario.create({
     data: {
       email: dadosUsuario.email,
@@ -42,9 +118,9 @@ app.post("/cadastro", async (req, res) => {
       senha: hash
     }
   })
-
   return res.status(201).json(usuarioCriado)
 })
+
 
 app.put("/usuarios/:id", async (req, res) => {
   const idUsuario = Number(req.params.id)
@@ -136,25 +212,6 @@ app.delete('/exames/:id', async (req, res) => {
     mensagem: "Exame deletado com sucesso!",
     data: exameDeletado
   });
-})
-
-app.post("/login", async (req, res) => {
-  const { email, senha } = req.body as { email: string; senha: string }
-
-  const usuario = await prisma.usuario.findUnique({
-    where: {
-      email
-    }
-  })
-
-  if (!usuario) {
-    return res.status(401).json({ message: "Usuário não encontrado" })
-  }
-
-  const senhaValida = await bcrypt.compare(senha, usuario.senha)
-  if (!senhaValida) {
-    return res.status(401).json({ message: "Senha inválida" })
-  }
 })
 
 app.listen(port, () => {

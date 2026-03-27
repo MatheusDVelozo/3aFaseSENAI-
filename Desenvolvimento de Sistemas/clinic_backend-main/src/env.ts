@@ -1,4 +1,4 @@
 export const env = {
-    chaveAcesso: process.env.chaveAcesso || "",
-    chaveRefresh: process.env.chaveRefresh || ""
+    chaveAcesso: process.env.CHAVE_ACESSO || "chaveSuperSecreta123456",
+    chaveRefresh: process.env.CHAVE_REFRESH || "chaveSuperSecreta123456"
 }
