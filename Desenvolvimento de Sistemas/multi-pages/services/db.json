@@ -62,5 +62,52 @@
             "name": "Maria",
             "idade": "27"
         }
+    ],
+    "autores": [
+        {
+            "id": 1,
+            "nome": "Machado de Assis",
+            "foto": "https://placehold.co/300x200",
+            "descricao": "Escritor brasileiro, considerado um dos maiores nomes da literatura nacional.",
+            "biografia": "Machado de Assis foi romancista, cronista, dramaturgo e poeta...",
+            "especialidade": "Literatura Brasileira",
+            "cidade": "Rio de Janeiro"
+        },
+        {
+            "id": 2,
+            "nome": "Clarice Lispector",
+            "foto": "https://placehold.co/300x200",
+            "descricao": "Uma das mais importantes escritoras do século XX no Brasil.",
+            "biografia": "Clarice Lispector destacou-se por sua escrita introspectiva e inovadora...",
+            "especialidade": "Romance e Contos",
+            "cidade": "Recife"
+        },
+        {
+            "id": 3,
+            "nome": "Jorge Amado",
+            "foto": "https://placehold.co/300x200",
+            "descricao": "Autor brasileiro conhecido por retratar a cultura baiana.",
+            "biografia": "Jorge Amado escreveu diversas obras marcadas por regionalismo e crítica social...",
+            "especialidade": "Romance Regionalista",
+            "cidade": "Salvador"
+        },
+        {
+            "id": 4,
+            "nome": "Carlos Drummond de Andrade",
+            "foto": "https://placehold.co/300x200",
+            "descricao": "Um dos maiores poetas brasileiros do século XX.",
+            "biografia": "Drummond foi poeta, cronista e contista, conhecido por sua linguagem moderna...",
+            "especialidade": "Poesia",
+            "cidade": "Itabira"
+        },
+        {
+            "id": 5,
+            "nome": "Cecília Meireles",
+            "foto": "https://placehold.co/300x200",
+            "descricao": "Poetisa e educadora brasileira de grande relevância.",
+            "biografia": "Cecília Meireles destacou-se pela musicalidade e lirismo de suas obras...",
+            "especialidade": "Poesia e Literatura Infantil",
+            "cidade": "Rio de Janeiro"
+        }
     ]
 }
