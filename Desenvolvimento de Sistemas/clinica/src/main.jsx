@@ -2,28 +2,39 @@ import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import './index.css'
 
-// react-router
-import { createBrowserRouter, RouterProvider } from 'react-router-dom'
+//react router
+import { createBrowserRouter } from "react-router";
+import { RouterProvider } from "react-router/dom";
 
 //toastify
-import { ToastContainer } from 'react-toastify'
-import 'react-toastify/dist/ReactToastify.css';
-
-import Login from './pages/Login/Index';
-import Dashboard from './pages/Dashboard/Index';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css'
+import Login from './pages/Login';
+import Dashboard from './pages/Dashboard';
 import { AuthProvider } from './contexts/AuthContext';
-
+import PrivateRoute from './PrivateRoute/Index';
+import DashboardLayout from './layouts/DashboardLayout';
 
 
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <Login />,
+    element: <Login />
   },
   {
     path: "/dashboard",
-    element: <Dashboard />,
-  },
+    element: (
+      <PrivateRoute>
+        <DashboardLayout />
+      </PrivateRoute>
+    ),
+    children: [
+      {
+        path: "/dashboard",
+        element: <Dashboard />
+      }
+    ]
+  }
 ]);
 
 createRoot(document.getElementById('root')).render(

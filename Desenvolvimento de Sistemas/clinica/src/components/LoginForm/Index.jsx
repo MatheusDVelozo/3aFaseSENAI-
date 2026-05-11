@@ -1,96 +1,132 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
+
 import { toast } from 'react-toastify'
 
-import { useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router'
+
 import axios from 'axios'
 
+// Contexto
 import { useAuth } from '../../contexts/AuthContext'
 
+// Modal
+import Modal from '../Modal'
+import RegisterUser from '../RegisterUser'
+
 const LoginForm = () => {
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
+    const [email, setEmail] = useState("")
+    const [password, setPassword] = useState("")
 
-  const navigate = useNavigate()
+    const navigate = useNavigate()
 
-  const { login } = useAuth()
+    const { login, user } = useAuth()
 
-  // validação de login
-  const handleLogin = async (e) => {
-    e.preventDefault()
+    // controle do modal
 
-    try {
-      // Consulta o json-server para encontrar o usuário
-      const response = await axios.get('http://localhost:3000/users', { params: { email, password } })
+    const [isModalOpen, setIsModalOpen] = useState(false)
 
-      const users = response.data
+    // autenticação do usuario (verificação)
+    useEffect(() => {
+        if (user) {
+            navigate('/dashboard')
+        }
+    }, [user, navigate])
 
-      if (!Array.isArray(users) || users.length === 0) {
-        toast.error('Email ou senha inválidos', {
-          autoClose: 3000,
-          hideProgressBar: true
-        })
-        return
-      }
+    //validação de login
+    const handleLogin = async (e) => {
+        e.preventDefault()
 
-      // Autentica com o email do primeiro usuário encontrado
-      const user = users[0]
-      if (typeof login === 'function') login(user.email)
+        try {
+            const response = await axios.get('http://localhost:3000/users', {
+                params: { email, password }
+            })
 
-      toast.success('Login realizado com sucesso!', {
-        autoClose: 3000,
-        hideProgressBar: true
-      })
+            console.log("response", response)
+            // console.log("params", params)
 
-      navigate('/dashboard')
+            if (response.data.length === 0) {
+                toast.error('Usuário não encontrado. Verifique o email e senha', {
+                    autoClose: 3000,
+                    hideProgressBar: true
+                });
+                return;
+            }
 
-    } catch (error) {
-      const msg = error.response?.data?.message || error.message || 'Erro ao conectar com o servidor'
-      toast.error(`Erro ao efetuar login: ${msg}`, {
-        autoClose: 4000,
-        hideProgressBar: true
-      })
-      console.error('Login error:', error)
+            login(email)
+
+            toast.success('Login realizado com sucesso!', {
+                autoClose: 2000
+            })
+
+            setTimeout(() => navigate('/dashboard', 2000))
+
+        } catch (error) {
+            console.error('Erro ao verificar usuário', error)
+            toast.error('Erro ao conectar com o servidor', {
+                autoClose: 3000
+            })
+        }
     }
-  }
 
-  return (
-    <div className='max-w-md mx-auto mt-10 bg-white p-8 border rounded-xl shadow-lg '>
-      <h2 className='text-2xl font-bold text-center mb-6'>Login</h2>
 
-      <form onSubmit={handleLogin} className='space-y-4'>
 
-        <fieldset>
-          <label htmlFor="email" className='block text-sm font-medium mb-1'>Email</label>
-          <input
-            type="email"
-            onChange={(e) => setEmail(e.target.value)}
-            id="email"
-            value={email}
-            required
-            className='w-full p-2 border rounded-lg focus:outline-none focus:border-blue-500'
-          />
-        </fieldset>
-        <fieldset>
-          <label htmlFor="password" className=''>Senha</label>
-          <input
-            type="password"
-            onChange={(e) => setPassword(e.target.value)}
-            minLength={8}
-            id="password"
-            value={password}
-            required
-            className='w-full p-2 border rounded-lg focus:outline-none focus:border-blue-500'
-          />
+    return (
+        <div className='max-w-md mx-auto mt-10 bg-white p-8 rounded-xl shadow-lg'>
+            <h2 className='text-2xl font-bold text-center mb-6'>Login</h2>
 
-        </fieldset>
+            <form onSubmit={handleLogin} className='space-y-4'>
+                <fieldset>
+                    <label htmlFor='email' className='block text-sm font-medium mb-1'>Email</label>
+                    <input
+                        type='email'
+                        id='email'
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        required
+                        className='w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500'
+                    />
+                </fieldset>
 
-        <button
-          type='submit'
-          className='w-full bg-cyan-700 text-white p-2 rounded-lg hover:bg-cyan-800 transition-colors cursor-pointer'
-        >Entrar</button>
-      </form>
-    </div>
-  )
+                <fieldset>
+                    <label htmlFor='password' className='block text-sm font-medium mb-1'>Senha:</label>
+                    <input
+                        type='password'
+                        id='password'
+                        minLength={8}
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        required
+                        className='w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500'
+                    />
+                </fieldset>
+
+                <button
+                    type='submit'
+                    className='w-full bg-cyan-700 text-white p-2 rounded-lg hover:bg-cyan-800 transition-colors'>
+                    Entrar
+                </button>
+
+            </form>
+
+            <div className='flex justify-between mt-4 text-sm'>
+                <button onClick={() => toast.info('Funcionalidade em desenvolvimento')} className='text-blue-600 hover:underline cursor-pointer'>
+                    Esqueceu sua senha?
+                </button>
+
+                <button onClick={() => setIsModalOpen(true)} className='text-blue-600 hover:underline cursor-pointer'>
+                    Criar Conta
+                </button>
+            </div>
+
+            <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
+                <RegisterUser />
+            </Modal>
+
+
+
+
+        </div>
+    )
 }
 
 export default LoginForm

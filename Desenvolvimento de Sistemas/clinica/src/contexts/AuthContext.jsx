@@ -1,24 +1,28 @@
-import { createContext, useContext, useEffect, useState } from 'react'
+import { createContext, useContext, useState, useEffect } from 'react'
 
 const AuthContext = createContext()
 
 export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null)
 
+    //se já tiver email no localStorage, mantém login
+
     useEffect(() => {
-        const savedEmail = localStorage.getItem('email')
+        const savedEmail = localStorage.getItem("email")
+
         if (savedEmail) {
             setUser({ email: savedEmail })
         }
+
     }, [])
 
     const login = (email) => {
-        localStorage.setItem('email', email)
+        localStorage.setItem("email", email)
         setUser({ email })
     }
 
     const logout = () => {
-        localStorage.removeItem('email')
+        localStorage.removeItem("email")
         setUser(null)
     }
 
@@ -27,7 +31,9 @@ export const AuthProvider = ({ children }) => {
             {children}
         </AuthContext.Provider>
     )
+
 }
 
-//hook customizado para consummir o contexto de autenticação
+//hook customizado para consumir o contexto
+
 export const useAuth = () => useContext(AuthContext)
