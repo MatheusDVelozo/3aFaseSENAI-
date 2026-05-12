@@ -25,7 +25,8 @@ const LoginForm = () => {
 
     const [isModalOpen, setIsModalOpen] = useState(false)
 
-    // autenticação do usuario (verificação)
+    // autenticação do usuário (verificação)
+
     useEffect(() => {
         if (user) {
             navigate('/dashboard')
