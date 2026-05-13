@@ -24,7 +24,9 @@ const PatientsCounter = () => {
                 <FaHospitalUser className='text-blue-600' />
                 {patientsCounter}
             </h2>
+            <span>Pacientes</span>
         </div>
+        
     )
 }
 

@@ -15,6 +15,8 @@ import {
 import { useAuth } from '../../contexts/AuthContext'
 import { useState } from 'react'
 
+import { NavLink } from 'react-router'
+
 
 
 const SideMenu = () => {
@@ -63,13 +65,16 @@ const SideMenu = () => {
             <nav className='flex-1 p-4 space-y-4 overflow-y-auto'>
                 <ul className='space-y-3'>
                     <li>
-                        <Link
+                        <NavLink
                             to='/dashboard'
-                            className='flex items-center gap-3 hover:text-cyan-300'
+                            // className='flex items-center gap-3 hover:text-cyan-300'
+                            className={({ isActive, isPending }) =>
+                                isPending ? "flex items-center gap-3" : isActive ? "flex items-center gap-3 text-cyan-300" : ""
+                            }
                         >
                             <MdDashboard size={20} />
                             {!isCollapsed && <span>Início</span>}
-                        </Link>
+                        </NavLink>
                     </li>
                     <li>
                         <Link
